@@ -35,6 +35,10 @@
 
  Modified Apr 8, 2017 for Sencha Architect 4.x compatibility
  By Steve Drucker (sdrucker@figleaf.com)
+
+ Known issues:
+ - Issues with dynamic height resizing
+
  -------------------------------------------------------------------*/
 
 Ext.define('Ext.ux.form.TinyMceTextArea', {
@@ -43,6 +47,8 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
     alias: 'widget.tinymce',
 
     //-----------------------------------------------------------------
+
+    apiKey: '', // tinymce API Key
 
     /*
      Flag for tracking the initialization state
@@ -62,6 +68,7 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
 
     tinyMCEConfig: {},
 
+   
 
     /*
       tinymce 4.x plugins
@@ -119,8 +126,8 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
     browserSpellCheck: false,
     smallButtonIcons: false,
     combineToolbars: false,
-
     font_formats: 'Arial Unicode MS,Arial,helvetica,sans-serif;',
+
 
     formattingToolbar: "undo redo | bold italic underline strikethrough superscript subscript | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat",
 
@@ -130,6 +137,9 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
 
     toolbar: [], // configurable toolbar
     image_list: [], // allowed images for insertion
+
+
+    cssUrls: '',
 
     // ice specific
     iceUserName: 'anonymous',
@@ -211,13 +221,6 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
 
         me.on('resize', function(elm, width, height, oldWidth, oldHeight, eOpts) {
 
-            /*
-            alert('width:' + width + '\n' +
-            'height:' + height + '\n' +
-            'oldWidth:' + oldWidth + '\n' +
-            'oldHeight:' + oldHeight
-            );*/
-
             if (!me.noWysiwyg && !me.wysiwygIntialized) {
                 me.initEditor(height);
             } else {
@@ -251,6 +254,11 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
         parent = parent.up(".mce-container-body");
 
         var newHeight = height;
+
+        if (me.labelAlign == 'top') {
+            var labelEl = this.getEl().select(".x-form-item-label-top").elements[0];
+            newHeight -= labelEl.offsetHeight;
+        }
 
         var edToolbar = parent.down(".mce-toolbar-grp");
         if (edToolbar)
@@ -326,8 +334,8 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
                 '}',
 
                 '#' + cmpId + ' .mce-btn button {',
-                  'padding: 2px 4px 0px 4px !important;',
-                  'line-height: inherit !important',
+                'padding: 2px 4px 0px 4px !important;',
+                'line-height: inherit !important',
                 '}'
 
             );
@@ -472,13 +480,13 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
 
             // standard spellchecker
             if (Ext.Array.contains(plugins, "spellchecker") && !Ext.Array.contains(plugins, "tinymcespellchecker")) {
-               me.formattingToolbar += " | spellchecker ";
+                me.formattingToolbar += " | spellchecker ";
             }
 
             // use built in, browser-based spell checking
             Ext.applyIf(me.tinyMCEConfig, {
-             browser_spellcheck: me.browserSpellCheck
-            }); 
+                browser_spellcheck: me.browserSpellCheck
+            });
 
             // 
             // Toolbars and Menus
@@ -625,7 +633,7 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
             });
 
             // Catch and propagate the change event 
-            if (me.bind && me.bind.value) {
+            if (me.bind && me.bind.value && !me.bind.single) {
                 var ev = 'blur';
             } else {
                 var ev = 'change';
@@ -644,6 +652,8 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
                     me.validate();
                 }
             });
+
+          
 
             // This ensures that the focusing the editor
             // bring the parent window to front

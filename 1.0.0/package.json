@@ -1,5 +1,6 @@
 {
     "name": "TinyMCE",
+    "namespace" : "TinyMCE",
     "type": "code",
     "creator": "Steve Drucker (@sdruckerfig)",
     "summary": "A plugin for the TinyMCE Editor by Oleg Schildt",
@@ -7,9 +8,9 @@
     "version": "1.0.0",
     "compatVersion": "1.0.0",
     "architect": {
-        "defsonly": true,
+        "creator" : "Steve Drucker",
         "compatFrameworks": [
-            "ext62"
+            "ext50","ext51","ext60","ext61","ext62"
         ],
         "requires": [
            
@@ -25,5 +26,9 @@
     "local": true,
     "requires": [
      
+    ],
+    "classpath" : [
+        "${package.dir}/src",
+        "${package.dir}/${toolkit.name}/src"
     ]
 }

@@ -11,7 +11,7 @@ Installation:
 Select File | Install User Extension | Select TinyMCE.aux
 
 Usage Notes:
-After deploying the component into your app, you will need to manually add "packages/TinyMCE/src" to your app's classpath in the app.json file.
+Deploy the component to your app by simply dragging the "TinyMCE Wysiwyg Editor" component from the toolbox onto your design canvas. See the TinyMCE docs at https://www.tinymce.com/docs/configure/integration-and-setup/ for information about plugins and other configuration options.
 
 
  

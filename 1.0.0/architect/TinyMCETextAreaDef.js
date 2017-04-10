@@ -11,24 +11,6 @@
 
     ],
 
-    "architect" : {
-        "type": "code",
-        "creator": "Steve Drucker",
-        "version": "0.9",
-        "summary" : "Deploy the TinyMCE 4.x editor from the cloud",
-        "compatFrameworks": [
-            "ext50","ext51","ext60","ext62"
-        ],
-        "local" : "local",
-        "classes" : [
-            {
-                "definition": "TinyMCETextAreaDef.js",
-                "className": "Ext.ux.form.TinyMceTextArea",
-                "js": ["TinyMceTextArea.js"]
-            }
-        ]
-    },
-
     "toolbox": {
         "name": "TinyMCE WYSIWYG Editor",
         "category": "Form Fields",
@@ -47,6 +29,13 @@
     {
         "name" : "spellchecker_whitelistUrl",
         "type" : "uri",
+        "hidden" : false,
+        "initialValue" : ""
+      
+    },
+     {
+        "name" : "cssUrls",
+        "type" : "string",
         "hidden" : false,
         "initialValue" : ""
       
