@@ -36,8 +36,6 @@
  Modified Apr 8, 2017 for Sencha Architect 4.x compatibility
  By Steve Drucker (sdrucker@figleaf.com)
 
- Known issues:
- - Issues with dynamic height resizing
 
  -------------------------------------------------------------------*/
 
@@ -68,7 +66,7 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
 
     tinyMCEConfig: {},
 
-   
+
 
     /*
       tinymce 4.x plugins
@@ -126,8 +124,8 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
     browserSpellCheck: false,
     smallButtonIcons: false,
     combineToolbars: false,
-    font_formats: 'Arial Unicode MS,Arial,helvetica,sans-serif;',
 
+    font_formats: 'Arial Unicode MS,Arial,helvetica,sans-serif;',
 
     formattingToolbar: "undo redo | bold italic underline strikethrough superscript subscript | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat",
 
@@ -137,9 +135,6 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
 
     toolbar: [], // configurable toolbar
     image_list: [], // allowed images for insertion
-
-
-    cssUrls: '',
 
     // ice specific
     iceUserName: 'anonymous',
@@ -257,7 +252,7 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
 
         if (me.labelAlign == 'top') {
             var labelEl = this.getEl().select(".x-form-item-label-top").elements[0];
-            newHeight -= labelEl.offsetHeight;
+            newHeight -= (labelEl.offsetHeight + 3);
         }
 
         var edToolbar = parent.down(".mce-toolbar-grp");
@@ -355,38 +350,36 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
                 }
             }
 
+            // create copy of toolbar
+            var tb = [];
+
             // support directionality rtl/ltr
             if (Ext.Array.contains(plugins, "directionality")) {
                 if (me.showFormattingToolbar) {
                     me.formattingToolbar += " | ltr rtl ";
                 } else {
-                    me.toolbar.push("ltr");
-                    me.toolbar.push("rtl");
+                    tb.push("ltr");
+                    tb.push("rtl");
                 }
 
             }
 
             // emoticon support
             if (Ext.Array.contains(plugins, "emoticons")) {
-                me.toolbar.push("emoticons");
+                tb.push("emoticons");
             }
 
             if (Ext.Array.contains(plugins, "fullpage")) {
-                me.toolbar.push("fullpage");
+                tb.push("fullpage");
             }
 
-            if (Ext.Array.contains(plugins, "fullscreen")) {
-                if (!Ext.Array.contains(me.toolbar, "fullscreen")) {
-                    me.toolbar.push("fullscreen");
-                }
-            }
 
             if (Ext.Array.contains(plugins, "insertdatetime")) {
-                me.toolbar.push("insertdatetime");
+                tb.push("insertdatetime");
             }
 
             if (Ext.Array.contains(plugins, "nonbreaking")) {
-                me.toolbar.push("nonbreaking");
+                tb.push("nonbreaking");
                 Ext.applyIf(me.tinyMCEConfig, {
                     nonbreaking_force_tab: true
                 });
@@ -402,6 +395,7 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
                 Ext.applyIf(me.tinyMCEConfig, {
                     pagebreak_separator: "<br style='page-break-after:always'>"
                 });
+                tb.push("pagebreak");
             }
 
             if (Ext.Array.contains(plugins, "paste")) {
@@ -422,38 +416,39 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
             }
 
             if (Ext.Array.contains(plugins, "preview")) {
-                me.toolbar.push("preview");
+                tb.push("preview");
             }
 
             if (Ext.Array.contains(plugins, "print")) {
-                me.toolbar.push("print");
+                tb.push("print");
             }
 
             if (Ext.Array.contains(plugins, "save")) {
-                me.toolbar.push("save");
+                tb.push("save");
             }
 
             if (Ext.Array.contains(plugins, "searchreplace")) {
-                me.toolbar.push("searchreplace");
+                tb.push("searchreplace");
             }
 
             if (Ext.Array.contains(plugins, "table")) {
                 Ext.applyIf(me.tinyMCEConfig, {
-                    tools: "inserttable"
+                    tools: "table"
                 });
+                tb.push("table");
             }
 
             if (Ext.Array.contains(plugins, "textcolor")) {
-                me.toolbar.push("forecolor backcolor");
+                tb.push("forecolor backcolor");
             }
 
             if (Ext.Array.contains(plugins, "visualchars")) {
-                me.toolbar.push("visualchars");
+                tb.push("visualchars");
             }
 
             if (Ext.Array.contains(plugins, "visualblocks")) {
-                // me.toolbar.push("visualblocks");
-                me.formattingToolbar += " visualblocks ";
+                // tb.push("visualblocks");
+                tb.push("visualblocks");
             }
 
             if (Ext.Array.contains(plugins, "wordcount")) {
@@ -461,12 +456,17 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
             }
 
             if (Ext.Array.contains(plugins, "charmap")) {
-                me.toolbar.push("charmap");
+                tb.push("charmap");
             }
 
             if (Ext.Array.contains(plugins, "code") || Ext.Array.contains(plugins, "advcode")) {
-                me.toolbar.push("code");
+                tb.push("code");
             }
+
+            if (Ext.Array.contains(plugins, "fullscreen")) {
+                tb.push("fullscreen");
+            }
+
 
             // 
             // various spell checkers
@@ -504,21 +504,20 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
                 });
             }
 
-            if (me.toolbar.length > 0) {
+            if (tb.length > 0) {
                 if (me.showFormattingToolbar) {
                     if (!me.combineToolbars) {
                         Ext.applyIf(me.tinyMCEConfig, {
-                            toolbar2: me.toolbar.join(' ')
+                            toolbar2: tb.join(' ')
                         });
                     } else {
-                        me.formattingToolbar += " | " + me.toolbar.join(' ');
                         Ext.apply(me.tinyMCEConfig, {
-                            toolbar1: me.formattingToolbar
+                            toolbar1: me.formattingToolbar + " | " + tb.join(' ')
                         });
                     }
                 } else {
                     Ext.applyIf(me.tinyMCEConfig, {
-                        toolbar1: me.toolbar.join(' ')
+                        toolbar1: tb.join(' ')
                     });
                 }
             }
@@ -653,7 +652,7 @@ Ext.define('Ext.ux.form.TinyMceTextArea', {
                 }
             });
 
-          
+
 
             // This ensures that the focusing the editor
             // bring the parent window to front
